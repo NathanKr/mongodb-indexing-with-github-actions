@@ -27,10 +27,10 @@ another issue is how to create the indexing - can i create it from mongodb schem
 
   <h3>1. Install <code>migrate-mongo</code> Package</h3>
   <p><code>migrate-mongo</code> is typically installed as a development dependency. This is because it's a tool used for managing database changes during your development and deployment workflows, rather than a runtime dependency for your live application code.</p>
-  <pre><code>npm install migrate-mongo --save-dev
-# Or if you're using Yarn:
-# yarn add migrate-mongo --dev
-</code></pre>
+
+```javascript  
+npm i -D migrate-mongo 
+```
 
   <h3>2. Initialize <code>migrate-mongo</code> Project</h3>
   <p>After installing the package, you need to initialize <code>migrate-mongo</code> in your project's root directory. This command sets up the necessary configuration file and creates a dedicated directory for your migration scripts.</p>
@@ -53,7 +53,7 @@ another issue is how to create the indexing - can i create it from mongodb schem
   </ul>
 
   <p><strong>Example <code>migrate-mongo-config.js</code>:</strong></p>
-  
+
   ```javascript
   // migrate-mongo-config.js
 // It's recommended to use a package like 'dotenv' to load environment variables
