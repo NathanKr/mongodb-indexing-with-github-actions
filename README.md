@@ -40,7 +40,7 @@ You can also use npm \ yarn
   npx migrate-mongo init
 ```
 
-This is the create migrate-mongo-config file
+This is the created migrate-mongo-config file
 
 ```javascript
 // In this file you can configure migrate-mongo
@@ -103,42 +103,6 @@ module.exports = config;
     <li><strong><code>migrationsDir</code></strong>: Specifies the directory where your migration script files are stored (typically <code>'./migrations'</code>).</li>
     <li><strong><code>changelogCollectionName</code></strong>: The name of the collection <code>migrate-mongo</code> uses internally to track which migrations have been applied (default is <code>changelog</code>).</li>
   </ul>
-
-  <p><strong>Example <code>migrate-mongo-config.js</code>:</strong></p>
-
-  ```javascript
-  // migrate-mongo-config.js
-// It's recommended to use a package like 'dotenv' to load environment variables
-// For example, if you use dotenv:
-require('dotenv').config();
-
-module.exports = {
-  mongodb: {
-    // Dynamically load MongoDB URI and database name based on environment variables
-    // This allows you to easily switch between dev, preview, and production databases
-    url: process.env.MONGODB_URI || 'mongodb://localhost:27017', // Fallback for local dev
-    databaseName: process.env.MONGODB_DB_NAME || 'my_development_db', // Fallback for local dev
-
-    options: {
-      useNewUrlParser: true,      // Recommended for new connections
-      useUnifiedTopology: true,   // Recommended for new connections
-      // Add other MongoDB connection options here if needed, e.g.,
-      // connectTimeoutMS: 30000,
-      // socketTimeoutMS: 30000,
-      // authSource: 'admin',
-      // auth: { username: process.env.MONGO_USER, password: process.env.MONGO_PASSWORD }
-    }
-  },
-
-  migrationsDir: "migrations", // The directory containing your migration files
-  changelogCollectionName: "changelog", // The collection where migrate-mongo logs applied migrations
-  migrationFileExtension: ".js", // The file extension for your migration scripts
-  // You can add more custom configurations here if your project needs them
-};
-```
-
-
-
 
 <h2>Usage</h2>
 ....
