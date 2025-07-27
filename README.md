@@ -108,7 +108,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
     <pre><code>db.wallet_transactions.createIndex({ clerkUserId: 1, timestampUTC: -1 });</code></pre>
     <ul>
       <li>MongoDB uses this compound index (<strong><code>IXSCAN</code></strong>). It efficiently locates all documents for the given <code>clerkUserId</code>.</li>
-      <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are <strong>already pre-sorted<strong> as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
+      <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are <strong>already pre-sorted</strong> as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
       <li><strong>Result:</strong> <strong>Extremely Fast</strong> retrieval of user wallet history (milliseconds), even with millions of transactions. Low server load.</li>
     </ul>
   </li>
