@@ -103,7 +103,134 @@ module.exports = config;
   </ul>
 
 <h2>Usage</h2>
-....
+<p>Once <code>migrate-mongo</code> is installed and configured, you can start creating and applying your database migrations using its command-line interface (CLI).</p>
+
+<h3>1. Create a New Migration Script</h3>
+<p>Whenever you need to make a change to your database schema (e.g., adding an index, creating a new collection, modifying a field), you create a new migration file.</p>
+<pre><code>npx migrate-mongo create &lt;a_descriptive_migration_name&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code>npx migrate-mongo create add_user_wallet_indexes
+</code></pre>
+<p>This command will generate a new JavaScript file in your <code>migrations/</code> directory. The filename will typically include a timestamp followed by your descriptive name (e.g., <code>20250727103000-add_user_wallet_indexes.js</code>). The timestamp ensures migrations are applied in the correct chronological order.</p>
+
+<h3>2. Write Your Migration Logic (in the created <code>.js</code> file)</h3>
+<p>Open the newly created migration file. It will contain two asynchronous functions: <code>up</code> and <code>down</code>.</p>
+<ul>
+  <li>The <strong><code>up</code> function</strong> contains the logic to apply your database changes (e.g., create indexes, add new fields, insert initial data).</li>
+  <li>The <strong><code>down</code> function</strong> contains the logic to reverse or undo the changes made in the <code>up</code> function. This is crucial for rollbacks or if you need to revert a deployment.</li>
+</ul>
+<p>Both functions receive a <code>db</code> object (a native MongoDB driver <code>Db</code> instance) and a <code>client</code> object (a native MongoDB driver <code>MongoClient</code> instance), which you use to interact with your MongoDB database.</p>
+
+<p><strong>Example <code>migrations/20250727103000-add_user_wallet_indexes.js</code>:</strong></p>
+
+```javascript
+module.exports = {
+async up(db, client) {
+  // This is where you write the code to apply your database changes.
+  // Use the 'db' object to access your collections and perform operations.
+
+  console.log('Applying migration: Creating indexes on wallet_transactions...');
+
+  // Scenario 1: Compound Index for efficient user history lookup
+  await db.collection('wallet_transactions').createIndex(
+    { clerkUserId: 1, timestampUTC: -1 },
+    { name: 'idx_clerkUserId_timestampUTC' }
+  );
+  console.log('Created compound index: idx_clerkUserId_timestampUTC');
+
+  // Scenario 2: Unique Index for Braintree Transaction ID lookup and data integrity
+  await db.collection('wallet_transactions').createIndex(
+    { braintreeTransactionId: 1 },
+    { unique: true, name: 'idx_braintreeTransactionId_unique' }
+  );
+  console.log('Created unique index: idx_braintreeTransactionId_unique');
+
+  // You can add more database operations here as needed, e.g.:
+  // await db.collection('new_collection').insertOne({ data: 'initial' });
+},
+
+async down(db, client) {
+  // This is where you write the code to revert the changes made in the 'up' function.
+  // Always consider the reverse operation for safety.
+
+  console.log('Reverting migration: Dropping indexes from wallet_transactions...');
+
+  // Drop the compound index
+  await db.collection('wallet_transactions').dropIndex('idx_clerkUserId_timestampUTC');
+  console.log('Dropped compound index: idx_clerkUserId_timestampUTC');
+
+  // Drop the unique index
+  await db.collection('wallet_transactions').dropIndex('idx_braintreeTransactionId_unique');
+  console.log('Dropped unique index: idx_braintreeTransactionId_unique');
+
+  // Revert other changes, e.g.:
+  // await db.collection('new_collection').drop();
+}
+};
+```
+
+<h3>3. Run <code>migrate-mongo</code> CLI Commands</h3>
+<p>Once your migration script is ready, you'll use <code>migrate-mongo</code>'s CLI commands to manage the application of these changes to your database.</p>
+
+<ul>
+  <li><strong>Check Migration Status:</strong>
+    <p>To see which migrations are pending (not yet applied) and which have already been applied to your database:</p>
+
+  ```bash
+  npx migrate-mongo status
+  ```
+    <p>This helps you understand the current state of your database schema across environments.</p>
+  </li>
+  <li><strong>Apply Pending Migrations:</strong>
+    <p>To run all migrations in the <code>migrations/</code> directory that have not yet been applied to the database:</p>
+    
+  ```bash
+  npx migrate-mongo up
+  ```
+
+    <p>This command executes the <code>up</code> function of each pending migration script in chronological order. <code>migrate-mongo</code> logs the successful application of each migration in its <code>changelog</code> collection within your database.</p>
+  </li>
+  <li><strong>Rollback the Last Migration:</strong>
+    <p>To revert the most recently applied migration (by executing its <code>down</code> function):</p>
+    
+  ```bash
+  npx migrate-mongo down
+  ```
+    
+  <div>
+    <p><strong>Important Note on Rollbacks:</strong> This is useful for local development or for quickly undoing a faulty deployment in a non-production environment. <strong>Use with extreme caution in production</strong>, as data changes made by the <code>up</code> script might not be perfectly reversible and could lead to data loss or corruption.</p>
+  </div>
+  </li>
+</ul>
+
+<h3>Integration with GitHub Actions</h3>
+<p>In your GitHub Actions workflow (defined in <code>.github/workflows/*.yml</code> files), you will integrate these <code>npx migrate-mongo</code> commands within your <code>run</code> steps. You'll dynamically provide the <code>MONGODB_URI</code> and <code>MONGODB_DB_NAME</code> environment variables (ideally from GitHub Secrets for security) to ensure your workflows target the correct MongoDB database for each environment (development, preview, production).</p>
+
+```yaml
+# Example snippet for a GitHub Actions workflow that runs migrations
+jobs:
+deploy:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Or your desired Node.js version
+
+    - name: Install Project Dependencies
+      run: npm ci # Use 'npm ci' for clean, consistent installs in CI environments
+
+    - name: Run Database Migrations (e.g., for production environment)
+      env:
+        # These secrets must be configured in your GitHub repository settings
+        MONGODB_URI: ${{ secrets.MONGODB_URI_PROD }}
+        MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME_PROD }}
+        # Optionally, if your migrate-mongo-config.js is not in the root:
+        # MIGRATE_MONGO_CONFIG: './path/to/migrate-mongo-config.js'
+      run: npx migrate-mongo up
+```
 
 
 <h2>Technologies Used</h2>
