@@ -100,7 +100,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
     <ul>
       <li>MongoDB would likely perform a <strong><code>COLLSCAN</code></strong> (Collection Scan), reading every document.</li>
       <li>It would then filter for the <code>clerkUserId</code>.</li>
-      <li>Finally, it would perform a slow, **in-memory sort** of all matching transactions by <code>timestampUTC</code>.</li>
+      <li>Finally, it would perform a slow, <strong>in-memory sort</strong> of all matching transactions by <code>timestampUTC</code>.</li>
       <li><strong>Result:</strong> <strong>Very Slow</strong> query times, especially for popular users or a large collection. High server resource consumption.</li>
     </ul>
   </li>
@@ -108,7 +108,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
     <pre><code>db.wallet_transactions.createIndex({ clerkUserId: 1, timestampUTC: -1 });</code></pre>
     <ul>
       <li>MongoDB uses this compound index (<strong><code>IXSCAN</code></strong>). It efficiently locates all documents for the given <code>clerkUserId</code>.</li>
-      <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are **already pre-sorted** as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
+      <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are <strong>already pre-sorted<strong> as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
       <li><strong>Result:</strong> <strong>Extremely Fast</strong> retrieval of user wallet history (milliseconds), even with millions of transactions. Low server load.</li>
     </ul>
   </li>
@@ -134,7 +134,7 @@ db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
     <pre><code>db.wallet_transactions.createIndex({ braintreeTransactionId: 1 }, { unique: true });</code></pre>
     <ul>
       <li>MongoDB uses this unique index (<strong><code>IXSCAN</code></strong>) to <strong>instantly pinpoint</strong> the exact document.</li>
-      <li>The <code>unique: true</code> option also **ensures data integrity**, preventing accidental duplicate records for the same Braintree transaction.</li>
+      <li>The <code>unique: true</code> option also <strong>ensures data integrity</strong>, preventing accidental duplicate records for the same Braintree transaction.</li>
       <li><strong>Result:</strong> <strong>Instantaneous</strong> lookups (sub-millisecond), highly reliable, and enforces data quality. This is also vital for fast <strong>update operations</strong> on this specific transaction.</li>
     </ul>
   </li>
