@@ -100,8 +100,6 @@ module.exports = config;
   <ul>
     <li><strong><code>mongodb.url</code></strong>: Your MongoDB connection string. It's best practice to use environment variables for this, especially when dealing with different environments, to avoid hardcoding sensitive credentials.</li>
     <li><strong><code>mongodb.databaseName</code></strong>: The specific database within your MongoDB instance that <code>migrate-mongo</code> should manage.</li>
-    <li><strong><code>migrationsDir</code></strong>: Specifies the directory where your migration script files are stored (typically <code>'./migrations'</code>).</li>
-    <li><strong><code>changelogCollectionName</code></strong>: The name of the collection <code>migrate-mongo</code> uses internally to track which migrations have been applied (default is <code>changelog</code>).</li>
   </ul>
 
 <h2>Usage</h2>
