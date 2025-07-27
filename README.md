@@ -21,7 +21,71 @@ using github actions you get Trackable changes (versioned, reviewed in Git) outo
 another issue is how to create the indexing - can i create it from mongodb schema - does it exist
 
 <h2>Installation</h2>
-....
+
+
+  <p>To get started with <code>migrate-mongo</code> in your Node.js project, follow these steps:</p>
+
+  <h3>1. Install <code>migrate-mongo</code> Package</h3>
+  <p><code>migrate-mongo</code> is typically installed as a development dependency. This is because it's a tool used for managing database changes during your development and deployment workflows, rather than a runtime dependency for your live application code.</p>
+  <pre><code>npm install migrate-mongo --save-dev
+# Or if you're using Yarn:
+# yarn add migrate-mongo --dev
+</code></pre>
+
+  <h3>2. Initialize <code>migrate-mongo</code> Project</h3>
+  <p>After installing the package, you need to initialize <code>migrate-mongo</code> in your project's root directory. This command sets up the necessary configuration file and creates a dedicated directory for your migration scripts.</p>
+  <pre><code>npx migrate-mongo init
+</code></pre>
+  <p>This command performs two key actions:</p>
+  <ul>
+    <li>It creates a <code>migrate-mongo-config.js</code> file in your project's root. This file is crucial for configuring your MongoDB connection details and migration settings.</li>
+    <li>It creates a <code>migrations/</code> directory in your project's root. This is the designated location where all your individual migration script files (written in JavaScript) will reside.</li>
+  </ul>
+
+  <h3>3. Configure <code>migrate-mongo-config.js</code></h3>
+  <p>Open the <code>migrate-mongo-config.js</code> file that was just generated. You need to configure this file to tell <code>migrate-mongo</code> how to connect to your MongoDB databases for each of your environments (development, preview, production).</p>
+  <p><strong>Key properties to configure:</strong></p>
+  <ul>
+    <li><strong><code>mongodb.url</code></strong>: Your MongoDB connection string. It's best practice to use environment variables for this, especially when dealing with different environments, to avoid hardcoding sensitive credentials.</li>
+    <li><strong><code>mongodb.databaseName</code></strong>: The specific database within your MongoDB instance that <code>migrate-mongo</code> should manage.</li>
+    <li><strong><code>migrationsDir</code></strong>: Specifies the directory where your migration script files are stored (typically <code>'./migrations'</code>).</li>
+    <li><strong><code>changelogCollectionName</code></strong>: The name of the collection <code>migrate-mongo</code> uses internally to track which migrations have been applied (default is <code>changelog</code>).</li>
+  </ul>
+
+  <p><strong>Example <code>migrate-mongo-config.js</code>:</strong></p>
+  
+  ```javascript
+  // migrate-mongo-config.js
+// It's recommended to use a package like 'dotenv' to load environment variables
+// For example, if you use dotenv:
+require('dotenv').config();
+
+module.exports = {
+  mongodb: {
+    // Dynamically load MongoDB URI and database name based on environment variables
+    // This allows you to easily switch between dev, preview, and production databases
+    url: process.env.MONGODB_URI || 'mongodb://localhost:27017', // Fallback for local dev
+    databaseName: process.env.MONGODB_DB_NAME || 'my_development_db', // Fallback for local dev
+
+    options: {
+      useNewUrlParser: true,      // Recommended for new connections
+      useUnifiedTopology: true,   // Recommended for new connections
+      // Add other MongoDB connection options here if needed, e.g.,
+      // connectTimeoutMS: 30000,
+      // socketTimeoutMS: 30000,
+      // authSource: 'admin',
+      // auth: { username: process.env.MONGO_USER, password: process.env.MONGO_PASSWORD }
+    }
+  },
+
+  migrationsDir: "migrations", // The directory containing your migration files
+  changelogCollectionName: "changelog", // The collection where migrate-mongo logs applied migrations
+  migrationFileExtension: ".js", // The file extension for your migration scripts
+  // You can add more custom configurations here if your project needs them
+};
+```
+
+
 
 
 <h2>Usage</h2>
