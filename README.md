@@ -40,7 +40,7 @@ You can also use npm \ yarn
   npx migrate-mongo init
 ```
 
-This is the created migrate-mongo-config file
+This is the created migrate-mongo-config.js file
 
 ```javascript
 // In this file you can configure migrate-mongo
@@ -381,11 +381,23 @@ db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
 ....
 
 <h2>Demo</h2>
-....
+
+first ever migrate-mongo status
+
+<img src='./figs/first-ever-migrate-mongo-status.png'/>
+
 
 <h2>Points of Interest</h2>
 <ul>
-    <li>...</li>
+    <li>You  can use typescript files for the migration files but not used here for simplicity</li>
+   
+</ul>
+
+<h2>open issues</h2>
+<ul>
+    <li>in migrate-mongo-config.js you define mongodb server url and db name , where is user name \ password and collection get into the picture</li>
+    <li>The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
+    <li>handling development \ preview \ production via env variables should be also for collections so it should be in the migration logic also i.e. wallet_transactions should be replaced with env variable</li>
    
 </ul>
 
