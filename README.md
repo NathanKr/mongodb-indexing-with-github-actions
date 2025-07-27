@@ -29,13 +29,65 @@ another issue is how to create the indexing - can i create it from mongodb schem
   <p><code>migrate-mongo</code> is typically installed as a development dependency. This is because it's a tool used for managing database changes during your development and deployment workflows, rather than a runtime dependency for your live application code.</p>
 
 ```javascript  
-npm i -D migrate-mongo 
+pnpm i -D migrate-mongo 
 ```
+You can also use npm \ yarn
 
   <h3>2. Initialize <code>migrate-mongo</code> Project</h3>
   <p>After installing the package, you need to initialize <code>migrate-mongo</code> in your project's root directory. This command sets up the necessary configuration file and creates a dedicated directory for your migration scripts.</p>
-  <pre><code>npx migrate-mongo init
-</code></pre>
+  
+  ```bash
+  npx migrate-mongo init
+```
+
+This is the create migrate-mongo-config file
+
+```javascript
+// In this file you can configure migrate-mongo
+
+const config = {
+  mongodb: {
+    // TODO Change (or review) the url to your MongoDB:
+    url: "mongodb://localhost:27017",
+
+    // TODO Change this to your database name:
+    databaseName: "YOURDATABASENAME",
+
+    options: {
+      useNewUrlParser: true, // removes a deprecation warning when connecting
+      useUnifiedTopology: true, // removes a deprecating warning when connecting
+      //   connectTimeoutMS: 3600000, // increase connection timeout to 1 hour
+      //   socketTimeoutMS: 3600000, // increase socket timeout to 1 hour
+    }
+  },
+
+  // The migrations dir, can be an relative or absolute path. Only edit this when really necessary.
+  migrationsDir: "migrations",
+
+  // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
+  changelogCollectionName: "changelog",
+
+  // The mongodb collection where the lock will be created.
+  lockCollectionName: "changelog_lock",
+
+  // The value in seconds for the TTL index that will be used for the lock. Value of 0 will disable the feature.
+  lockTtl: 0,
+
+  // The file extension to create migrations and search for in migration dir 
+  migrationFileExtension: ".js",
+
+  // Enable the algorithm to create a checksum of the file contents and use that in the comparison to determine
+  // if the file should be run.  Requires that scripts are coded to be run multiple times.
+  useFileHash: false,
+
+  // Don't change this, unless you know what you're doing
+  moduleSystem: 'commonjs',
+};
+
+module.exports = config;
+
+```
+
   <p>This command performs two key actions:</p>
   <ul>
     <li>It creates a <code>migrate-mongo-config.js</code> file in your project's root. This file is crucial for configuring your MongoDB connection details and migration settings.</li>

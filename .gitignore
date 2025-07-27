@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dotenv environment variables
+.env
+.env.*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+out/
+coverage/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite / Next.js
+.next/
+.vite/
+.vercel/
+
+# IDEs
+.vscode/
+.idea/
+
+# Optional cache
+.cache/
+.pnpm-store/
+turbo/
