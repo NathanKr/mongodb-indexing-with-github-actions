@@ -129,7 +129,7 @@ const config = {
 <p><strong>Example:</strong></p>
 <pre><code>npx migrate-mongo create add_user_wallet_indexes
 </code></pre>
-<p>This command will generate a new JavaScript file in your <code>migrations/</code> directory. The filename will typically include a timestamp followed by your descriptive name (e.g., <code>20250727103000-add_user_wallet_indexes.js</code>). The timestamp ensures migrations are applied in the correct chronological order.</p>
+<p>This command will generate a new JavaScript file in your <code>migrations/</code> directory. The filename will typically include a timestamp followed by your descriptive name (e.g., <code>20250728065805-add_user_wallet_indexes</code>). The timestamp ensures migrations are applied in the correct chronological order.</p>
 
 <h3>2. Write Your Migration Logic (in the created <code>.js</code> file)</h3>
 <p>Open the newly created migration file. It will contain two asynchronous functions: <code>up</code> and <code>down</code>.</p>
@@ -434,6 +434,16 @@ db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 first ever migrate-mongo status
 
 <img src='./figs/first-ever-migrate-mongo-status.png'/>
+
+npx migrate-mongo create add_user_wallet_indexes
+
+<img src='./figs/migrate-mongo-create.png'/>
+
+the file 20250728065805-add_user_wallet_indexes.js is created but it is just template for up and down. as shown here
+
+<img  src='./figs/template-file.png'/>
+
+so put there the code from the readme 
 
 <h2>Points of Interest</h2>
 <ul>
