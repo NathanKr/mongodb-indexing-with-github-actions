@@ -1,5 +1,5 @@
 <h1>Project Name</h1>
-Create MongoDb indexing with migrate-mongo and github actions
+Create <strong>MongoDB</strong> Indexing with <strong>migrate-mongo</strong> and <strong>GitHub Actions</strong>
 
 <h2>Project Description</h2>
 This project demonstrates a robust and automated solution for managing MongoDB database schema changes, with a specific focus on creating and applying performance-critical indexes, across multiple environments (development, preview, and production). Leveraging `migrate-mongo` for version-controlled database migrations and integrating seamlessly with GitHub Actions for CI/CD, this setup ensures consistent, repeatable, and secure database updates, making it ideal for small teams with simple yet critical database management needs.
@@ -62,10 +62,10 @@ const config = {
   // The migrations dir, can be a relative or absolute path. Only edit this when really necessary.
   migrationsDir: "migrations",
 
-  // The MongoDb collection where the applied changes are stored. Only edit this when really necessary.
+  // The MongoDB collection where the applied changes are stored. Only edit this when really necessary.
   changelogCollectionName: "changelog",
 
-  // The MongoDb collection where the lock will be created.
+  // The MongoDB collection where the lock will be created.
   lockCollectionName: "changelog_lock",
 
   // The value in seconds for the TTL index that will be used for the lock. Value of 0 will disable the feature.
@@ -103,7 +103,7 @@ This is the file after changes
 
 ```javascript
 
-// Load environment variables from .env file (for local development)
+// Load environment variables from .env.local file (for local development)
 require('dotenv').config({ path: '.env.local' });
 
 const config = {
@@ -300,7 +300,7 @@ deploy:
   <li><strong>GitHub Actions:</strong> A CI/CD platform used to automate workflows, including deploying code and running database migrations across different environments.</li>
 </ul>
 
-<h2>Introduction to MongoDb indexing</h2>
+<h2>Introduction to MongoDB indexing</h2>
 
 <p>MongoDB indexes are like a <strong>book's index</strong>: ordered references that allow the database to <strong>quickly locate data</strong> without scanning every document. They're vital for <strong>fast query performance</strong>.</p>
 
@@ -433,9 +433,6 @@ db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
   <p>In short, while the MongoDB driver gives you the power to interact with your database, <code>migrate-mongo</code> provides the <strong>structured, version-controlled, and automated framework</strong> necessary for safely and efficiently managing your database schema changes throughout your application's lifecycle, especially in a continuous integration/continuous deployment (CI/CD) environment like GitHub Actions.</p>
 
-<h2>Code Structure</h2>
-....
-
 <h2>Demo</h2>
 
 .env.local (development)
@@ -474,7 +471,7 @@ and status
 
 <img src='./figs/status-following-no-change.png' alt='Screenshot of the terminal output from migrate-mongo status after a no-change run, confirming the migration is still applied and no new ones are pending.'/>
 
-You might wonder how migrate-mongo remember not to apply changes if he already did it. this is done by adding a collection name changelog to your db as follows
+You might wonder how migrate-mongo remembers not to apply changes if they've already been done. This is achieved by adding a collection named changelog to your database, as follows:
 
 <img src='./figs/changlog-collection-in-db.png' alt='Screenshot of a MongoDB Compass view showing the changelog collection in the database, which tracks applied migrations.'/>
 
