@@ -1,23 +1,22 @@
 <h1>Project Name</h1>
-Create mongodb indexing with migrate-mongo and github actions
+Create MongoDb indexing with migrate-mongo and github actions
 
 <h2>Project Description</h2>
 This project demonstrates a robust and automated solution for managing MongoDB database schema changes, with a specific focus on creating and applying performance-critical indexes, across multiple environments (development, preview, and production). Leveraging `migrate-mongo` for version-controlled database migrations and integrating seamlessly with GitHub Actions for CI/CD, this setup ensures consistent, repeatable, and secure database updates, making it ideal for small teams with simple yet critical database management needs.
 
-
 <h2>Motivation</h2>
-You have three environemnt : dev \ preview \ production and you have mongodb database .
-You want to create indxing for prformance on all environemnt in a consitent way - how to do it :
+<p>You have three <strong>environments</strong>: dev, preview, and production, and you have a <strong>MongoDB</strong> database. You want to create <strong>indexing</strong> for <strong>performance</strong> on all <strong>environments</strong> in a <strong>consistent</strong> way – how do you achieve this?</p>
 
-given my knowledge with github actions - on one side automating it with it is natural choise
+<p>Given my knowledge with <strong>GitHub Actions</strong>, automating it with this tool is a natural <strong>choice</strong>.</p>
 
-but what else ?
+<p>But what else is needed?</p>
 
-for Small team, simple needs - migrate-mongo is the missing piece
+<p>For <strong>small teams with simple needs</strong>, <code>migrate-mongo</code> is the missing piece.</p>
 
-using github actions you get Trackable changes (versioned, reviewed in Git) outof the box
+<p>Using <strong>GitHub Actions</strong>, you get <strong>Trackable changes</strong> (versioned, reviewed in Git) out of the box.</p>
 
-another issue is how to create the indexing - can i create it from mongodb schema - does it exist
+<p>Another issue is how to create the <strong>indexing</strong> – <strong>can I create it from a MongoDB schema? Does such a concept exist?</strong></p>
+
 
 <h2>Installation</h2>
 
@@ -30,7 +29,7 @@ another issue is how to create the indexing - can i create it from mongodb schem
 pnpm i -D migrate-mongo
 ```
 
-You can also use npm \ yarn
+You can also use npm or yarn
 
   <h3>2. Initialize <code>migrate-mongo</code> Project</h3>
   <p>After installing the package, you need to initialize <code>migrate-mongo</code> in your project's root directory. This command sets up the necessary configuration file and creates a dedicated directory for your migration scripts.</p>
@@ -60,13 +59,13 @@ const config = {
     },
   },
 
-  // The migrations dir, can be an relative or absolute path. Only edit this when really necessary.
+  // The migrations dir, can be a relative or absolute path. Only edit this when really necessary.
   migrationsDir: "migrations",
 
-  // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
+  // The MongoDb collection where the applied changes are stored. Only edit this when really necessary.
   changelogCollectionName: "changelog",
 
-  // The mongodb collection where the lock will be created.
+  // The MongoDb collection where the lock will be created.
   lockCollectionName: "changelog_lock",
 
   // The value in seconds for the TTL index that will be used for the lock. Value of 0 will disable the feature.
@@ -301,7 +300,7 @@ deploy:
   <li><strong>GitHub Actions:</strong> A CI/CD platform used to automate workflows, including deploying code and running database migrations across different environments.</li>
 </ul>
 
-<h2>Introduction to mongodb indexing</h2>
+<h2>Introduction to MongoDb indexing</h2>
 
 <p>MongoDB indexes are like a <strong>book's index</strong>: ordered references that allow the database to <strong>quickly locate data</strong> without scanning every document. They're vital for <strong>fast query performance</strong>.</p>
 
@@ -475,7 +474,7 @@ and status
 <img src='./figs/status-following-no-change.png'/>
 
 
-You might wonder how migrate-mongo remember not to apply changes if he all ready did it. this is done by adding a collection name changelog to your db as follows
+You might wonder how migrate-mongo remember not to apply changes if he already did it. this is done by adding a collection name changelog to your db as follows
 
 <img src='./figs/changlog-collection-in-db.png'/>
 
