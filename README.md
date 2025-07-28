@@ -1,8 +1,6 @@
 <h1>Project Name</h1>
 ....
 
-
-
 <h2>Project Description</h2>
 ....
 
@@ -10,7 +8,7 @@
 You have three environemnt : dev \ preview \ production and you have mongodb database .
 You want to create indxing for prformance on all environemnt in a consitent way - how to do it :
 
-given my knowledge with github actions - on one side automating it with it is natural choise 
+given my knowledge with github actions - on one side automating it with it is natural choise
 
 but what else ?
 
@@ -22,15 +20,15 @@ another issue is how to create the indexing - can i create it from mongodb schem
 
 <h2>Installation</h2>
 
-
   <p>To get started with <code>migrate-mongo</code> in your Node.js project, follow these steps:</p>
 
   <h3>1. Install <code>migrate-mongo</code> Package</h3>
   <p><code>migrate-mongo</code> is typically installed as a development dependency. This is because it's a tool used for managing database changes during your development and deployment workflows, rather than a runtime dependency for your live application code.</p>
 
-```javascript  
-pnpm i -D migrate-mongo 
+```javascript
+pnpm i -D migrate-mongo
 ```
+
 You can also use npm \ yarn
 
   <h3>2. Initialize <code>migrate-mongo</code> Project</h3>
@@ -58,7 +56,7 @@ const config = {
       useUnifiedTopology: true, // removes a deprecating warning when connecting
       //   connectTimeoutMS: 3600000, // increase connection timeout to 1 hour
       //   socketTimeoutMS: 3600000, // increase socket timeout to 1 hour
-    }
+    },
   },
 
   // The migrations dir, can be an relative or absolute path. Only edit this when really necessary.
@@ -73,7 +71,7 @@ const config = {
   // The value in seconds for the TTL index that will be used for the lock. Value of 0 will disable the feature.
   lockTtl: 0,
 
-  // The file extension to create migrations and search for in migration dir 
+  // The file extension to create migrations and search for in migration dir
   migrationFileExtension: ".js",
 
   // Enable the algorithm to create a checksum of the file contents and use that in the comparison to determine
@@ -81,11 +79,10 @@ const config = {
   useFileHash: false,
 
   // Don't change this, unless you know what you're doing
-  moduleSystem: 'commonjs',
+  moduleSystem: "commonjs",
 };
 
 module.exports = config;
-
 ```
 
   <p>This command performs two key actions:</p>
@@ -125,48 +122,76 @@ module.exports = config;
 <p><strong>Example <code>migrations/20250727103000-add_user_wallet_indexes.js</code>:</strong></p>
 
 ```javascript
+const TRANSACTIONS_COLLECTION = "transactions";
+const USER_PAYMENT_PROFILES_COLLECTION = "user_payment_profiles";
+
 module.exports = {
-async up(db, client) {
-  // This is where you write the code to apply your database changes.
-  // Use the 'db' object to access your collections and perform operations.
+  async up(db, client) {
+    console.log(
+      `Applying migration: Creating indexes on ${TRANSACTIONS_COLLECTION}...`
+    );
 
-  console.log('Applying migration: Creating indexes on wallet_transactions...');
+    // Scenario 1: Compound Index for efficient user history lookup
+    await db
+      .collection(TRANSACTIONS_COLLECTION)
+      .createIndex(
+        { clerkUserId: 1, timestampUTC: -1 },
+        { name: "idx_transactions_clerkUserId_timestampUTC" } 
+      );
+    console.log("Created compound index: idx_transactions_clerkUserId_timestampUTC"); 
 
-  // Scenario 1: Compound Index for efficient user history lookup
-  await db.collection('wallet_transactions').createIndex(
-    { clerkUserId: 1, timestampUTC: -1 },
-    { name: 'idx_clerkUserId_timestampUTC' }
-  );
-  console.log('Created compound index: idx_clerkUserId_timestampUTC');
+    // Scenario 2: Unique Index for Braintree Transaction ID lookup and data integrity
+    await db
+      .collection(TRANSACTIONS_COLLECTION)
+      .createIndex(
+        { braintreeTransactionId: 1 },
+        { unique: true, name: "idx_transactions_braintreeTransactionId_unique" } 
+      );
+    console.log("Created unique index: idx_transactions_braintreeTransactionId_unique");
 
-  // Scenario 2: Unique Index for Braintree Transaction ID lookup and data integrity
-  await db.collection('wallet_transactions').createIndex(
-    { braintreeTransactionId: 1 },
-    { unique: true, name: 'idx_braintreeTransactionId_unique' }
-  );
-  console.log('Created unique index: idx_braintreeTransactionId_unique');
+    console.log(
+      `Applying migration: Creating indexes on ${USER_PAYMENT_PROFILES_COLLECTION}...`
+    );
 
-  // You can add more database operations here as needed, e.g.:
-  // await db.collection('new_collection').insertOne({ data: 'initial' });
-},
+    // Index for user_payment_profiles collection using clerkUserId
+    await db
+      .collection(USER_PAYMENT_PROFILES_COLLECTION)
+      .createIndex(
+        { clerkUserId: 1 },
+        { unique: true, name: "idx_userPaymentProfiles_clerkUserId_unique" }
+      );
+    console.log(
+      `Created unique index: idx_userPaymentProfiles_clerkUserId_unique`
+    );
+  },
 
-async down(db, client) {
-  // This is where you write the code to revert the changes made in the 'up' function.
-  // Always consider the reverse operation for safety.
+  async down(db, client) {
+    console.log(
+      `Reverting migration: Dropping indexes from ${TRANSACTIONS_COLLECTION}...`
+    );
+    await db
+      .collection(TRANSACTIONS_COLLECTION)
+      .dropIndex("idx_transactions_clerkUserId_timestampUTC"); 
+    console.log(
+      `Dropped compound index: idx_transactions_clerkUserId_timestampUTC`
+    );
+    await db
+      .collection(TRANSACTIONS_COLLECTION)
+      .dropIndex("idx_transactions_braintreeTransactionId_unique"); 
+    console.log(
+      `Dropped unique index: idx_transactions_braintreeTransactionId_unique`
+    );
 
-  console.log('Reverting migration: Dropping indexes from wallet_transactions...');
-
-  // Drop the compound index
-  await db.collection('wallet_transactions').dropIndex('idx_clerkUserId_timestampUTC');
-  console.log('Dropped compound index: idx_clerkUserId_timestampUTC');
-
-  // Drop the unique index
-  await db.collection('wallet_transactions').dropIndex('idx_braintreeTransactionId_unique');
-  console.log('Dropped unique index: idx_braintreeTransactionId_unique');
-
-  // Revert other changes, e.g.:
-  // await db.collection('new_collection').drop();
-}
+    console.log(
+      `Reverting migration: Dropping indexes from ${USER_PAYMENT_PROFILES_COLLECTION}...`
+    );
+    await db
+      .collection(USER_PAYMENT_PROFILES_COLLECTION)
+      .dropIndex("idx_userPaymentProfiles_clerkUserId_unique");
+    console.log(
+      `Dropped unique index: idx_userPaymentProfiles_clerkUserId_unique`
+    );
+  },
 };
 ```
 
@@ -177,10 +202,12 @@ async down(db, client) {
   <li><strong>Check Migration Status:</strong>
     <p>To see which migrations are pending (not yet applied) and which have already been applied to your database:</p>
 
-  ```bash
-  npx migrate-mongo status
-  ```
+```bash
+npx migrate-mongo status
+```
+
     <p>This helps you understand the current state of your database schema across environments.</p>
+
   </li>
   <li><strong>Apply Pending Migrations:</strong>
     <p>To run all migrations in the <code>migrations/</code> directory that have not yet been applied to the database:</p>
@@ -190,6 +217,7 @@ async down(db, client) {
   ```
 
     <p>This command executes the <code>up</code> function of each pending migration script in chronological order. <code>migrate-mongo</code> logs the successful application of each migration in its <code>changelog</code> collection within your database.</p>
+
   </li>
   <li><strong>Rollback the Last Migration:</strong>
     <p>To revert the most recently applied migration (by executing its <code>down</code> function):</p>
@@ -217,7 +245,7 @@ deploy:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # Or your desired Node.js version
+        node-version: "20" # Or your desired Node.js version
 
     - name: Install Project Dependencies
       run: npm ci # Use 'npm ci' for clean, consistent installs in CI environments
@@ -231,7 +259,6 @@ deploy:
         # MIGRATE_MONGO_CONFIG: './path/to/migrate-mongo-config.js'
       run: npx migrate-mongo up
 ```
-
 
 <h2>Technologies Used</h2>
 <ul>
@@ -270,12 +297,12 @@ deploy:
 {
   "_id": { "$oid": "68830e18d6a1c610277767cc" },
   "clerkUserId": "user_abc_4321", // Unique ID for your application's user
-  "type": "top_up",              // "top_up", "payment_out", "refund"
-  "amountMillicents": 7000,      // Amount in millicents (7.00 USD)
+  "type": "top_up", // "top_up", "payment_out", "refund"
+  "amountMillicents": 7000, // Amount in millicents (7.00 USD)
   "currency": "USD",
   "timestampUTC": { "$date": "2025-07-25T04:54:48.163Z" }, // When transaction occurred
   "description": "Braintree top_up for $7.00",
-  "status": "completed",         // "pending", "completed", "failed"
+  "status": "completed", // "pending", "completed", "failed"
   "braintreeTransactionId": "mqj10hxj", // ID from Braintree payment gateway
   "braintreeCustomerId": "user_abc_4321",
   "paymentMethodDetails": {
@@ -291,7 +318,7 @@ deploy:
 <p>Now, let's look at two common query scenarios:</p>
 
 <h3>Scenario 1: Finding All Wallet Transactions for a Specific User, Sorted by Most Recent</h3>
-<p>Users will frequently check their wallet history, wanting to see the newest transactions first. This is a critical feature for your app's user experience.</p>
+<p>Users will frequently check their payment history, wanting to see the newest transactions first. This is a critical feature for your app's user experience.</p>
 
 <p><strong>The Query:</strong></p>
 <pre><code>
@@ -314,7 +341,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
     <ul>
       <li>MongoDB uses this compound index (<strong><code>IXSCAN</code></strong>). It efficiently locates all documents for the given <code>clerkUserId</code>.</li>
       <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are <strong>already pre-sorted</strong> as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
-      <li><strong>Result:</strong> <strong>Extremely Fast</strong> retrieval of user wallet history (milliseconds), even with millions of transactions. Low server load.</li>
+      <li><strong>Result:</strong> <strong>Extremely Fast</strong> retrieval of user payment history (milliseconds), even with millions of transactions. Low server load.</li>
     </ul>
   </li>
 </ul>
@@ -347,7 +374,6 @@ db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
 <p>These examples demonstrate how specific indexes, tailored to your application's common query patterns, are essential for ensuring a fast, reliable, and scalable payment system within your "post2video" SaaS.</p>
 
-
 <h2>Design</h2>
 
 <h3> why migrate-mongo and not mongodb driver </h3>
@@ -375,8 +401,6 @@ db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
   <p>In short, while the MongoDB driver gives you the power to interact with your database, <code>migrate-mongo</code> provides the <strong>structured, version-controlled, and automated framework</strong> necessary for safely and efficiently managing your database schema changes throughout your application's lifecycle, especially in a continuous integration/continuous deployment (CI/CD) environment like GitHub Actions.</p>
 
-
-
 <h2>Code Structure</h2>
 ....
 
@@ -386,24 +410,21 @@ first ever migrate-mongo status
 
 <img src='./figs/first-ever-migrate-mongo-status.png'/>
 
-
 <h2>Points of Interest</h2>
 <ul>
     <li>You  can use typescript files for the migration files but not used here for simplicity</li>
-   
+   <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host).
+It should not apply to collection names, which should remain consistent across environments</li>
 </ul>
 
 <h2>open issues</h2>
 <ul>
-    <li>in migrate-mongo-config.js you define mongodb server url and db name , where is user name \ password and collection get into the picture</li>
     <li>The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
-    <li>handling development \ preview \ production via env variables should be also for collections so it should be in the migration logic also i.e. wallet_transactions should be replaced with env variable</li>
-   
+    
+   <li>i dont see how the workflow pick the correct environment : dev \ preview : prod</li>
 </ul>
 
 <h2>References</h2>
 <ul>
     <li><a href='https://www.npmjs.com/package/migrate-mongo'>migrate-mongo official docs</a></li>
-   
 </ul>
-
