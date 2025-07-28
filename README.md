@@ -139,7 +139,7 @@ const config = {
 </ul>
 <p>Both functions receive a <code>db</code> object (a native MongoDB driver <code>Db</code> instance) and a <code>client</code> object (a native MongoDB driver <code>MongoClient</code> instance), which you use to interact with your MongoDB database.</p>
 
-<p><strong>Example <code>migrations/20250727103000-add_user_wallet_indexes.js</code>:</strong></p>
+<p><strong>Example <code>migrations/20250728065805-add_user_wallet_indexes</code>:</strong></p>
 
 ```javascript
 const TRANSACTIONS_COLLECTION = "transactions";
@@ -444,6 +444,14 @@ the file 20250728065805-add_user_wallet_indexes.js is created but it is just tem
 <img  src='./figs/template-file.png'/>
 
 so put there the code from the readme 
+
+npx migrate-mongo up => create index for collections : transactions and user_payment_profiles
+
+<img src='./figs/migrate-mongo-up.png'/>
+
+now lets check status
+
+<img src='./figs/status-after-index-create.png'/>
 
 <h2>Points of Interest</h2>
 <ul>

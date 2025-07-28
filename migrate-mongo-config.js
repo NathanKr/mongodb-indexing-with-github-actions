@@ -1,7 +1,7 @@
 // In this file you can configure migrate-mongo
 
 // Load environment variables from .env file (for local development)
-require('dotenv').config(); 
+require('dotenv').config({ path: '.env.local' });
 
 const config = {
   mongodb: {
@@ -11,8 +11,8 @@ const config = {
     databaseName: process.env.MONGODB_DB_NAME ,
 
     options: {
-      useNewUrlParser: true, // removes a deprecation warning when connecting
-      useUnifiedTopology: true, // removes a deprecating warning when connecting
+      //useNewUrlParser: true, // removes a deprecation warning when connecting
+      //useUnifiedTopology: true, // removes a deprecating warning when connecting
       //   connectTimeoutMS: 3600000, // increase connection timeout to 1 hour
       //   socketTimeoutMS: 3600000, // increase socket timeout to 1 hour
     }
