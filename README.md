@@ -440,43 +440,43 @@ db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
 .env.local (development)
 
-<img src='./figs/env-local.png'/>
 
+<img src='./figs/env-local.png' alt='Screenshot of a .env.local file with environment variables for MongoDB URI and database name.'/>
 
 first ever migrate-mongo status
 
-<img src='./figs/first-ever-migrate-mongo-status.png'/>
+<img src='./figs/first-ever-migrate-mongo-status.png' alt='Screenshot of the terminal output from the first migrate-mongo status command, showing no migrations applied.'/>
 
 npx migrate-mongo create add_user_wallet_indexes
 
-<img src='./figs/migrate-mongo-create.png'/>
+<img src='./figs/migrate-mongo-create.png' alt='Screenshot of the terminal output creating a new migration file named add_user_wallet_indexes.'/>
 
 the file 20250728065805-add_user_wallet_indexes.js is created but it is just template for up and down. as shown here
 
-<img  src='./figs/template-file.png'/>
+<img src='./figs/template-file.png' alt='Screenshot of the initial template content of a newly created migrate-mongo migration file, showing empty up and down functions.'/>
 
 so put there the code from the readme 
 
 npx migrate-mongo up => create index for collections : transactions and user_payment_profiles
 
-<img src='./figs/migrate-mongo-up.png'/>
+<img src='./figs/migrate-mongo-up.png' alt='Screenshot of the terminal output from npx migrate-mongo up, showing indexes being created for transactions and user_payment_profiles collections.'/>
 
 now lets check status
 
-<img src='./figs/status-after-index-create.png'/>
+<img src='./figs/status-after-index-create.png' alt='Screenshot of the terminal output from migrate-mongo status, showing the add_user_wallet_indexes migration as successfully applied.'/>
+
 
 if you try another npx migrate-mongo up with no changes you will get
 
-<img src='./figs/migrate-mongo-up-with-no-changes.png'/>
+<img src='./figs/migrate-mongo-up-with-no-changes.png' alt='Screenshot of the terminal output from npx migrate-mongo up when no new migrations are pending, indicating no changes were applied.'/>
 
 and status
 
-<img src='./figs/status-following-no-change.png'/>
-
+<img src='./figs/status-following-no-change.png' alt='Screenshot of the terminal output from migrate-mongo status after a no-change run, confirming the migration is still applied and no new ones are pending.'/>
 
 You might wonder how migrate-mongo remember not to apply changes if he already did it. this is done by adding a collection name changelog to your db as follows
 
-<img src='./figs/changlog-collection-in-db.png'/>
+<img src='./figs/changlog-collection-in-db.png' alt='Screenshot of a MongoDB Compass view showing the changelog collection in the database, which tracks applied migrations.'/>
 
 <h2>Limitation - Environment Handling in GitHub Actions</h2>
 
