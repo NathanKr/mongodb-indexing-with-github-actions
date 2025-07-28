@@ -291,7 +291,7 @@ deploy:
 
 <h2>Example: Indexing a User Wallet Top-Up Transaction</h2>
 
-<p>Let's use a common payment transaction from your "post2video" app to illustrate the importance of indexing. Imagine your <code>wallet_transactions</code> collection stores records like this:</p>
+<p>Let's use a common payment transaction from your "post2video" app to illustrate the importance of indexing. Imagine your <code>transactions</code> collection stores records like this:</p>
 
 ```json
 {
@@ -322,7 +322,7 @@ deploy:
 
 <p><strong>The Query:</strong></p>
 <pre><code>
-db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
+db.transactions.find({ clerkUserId: "user_abc_4321" })
                       .sort({ timestampUTC: -1 });
 </code></pre>
 
@@ -337,7 +337,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
     </ul>
   </li>
   <li><strong>WITH a Compound Index on <code>clerkUserId</code> and <code>timestampUTC</code>:</strong>
-    <pre><code>db.wallet_transactions.createIndex({ clerkUserId: 1, timestampUTC: -1 });</code></pre>
+    <pre><code>db.transactions.createIndex({ clerkUserId: 1, timestampUTC: -1 });</code></pre>
     <ul>
       <li>MongoDB uses this compound index (<strong><code>IXSCAN</code></strong>). It efficiently locates all documents for the given <code>clerkUserId</code>.</li>
       <li>Crucially, because <code>timestampUTC</code> is also part of the index and in descending order (<code>-1</code>), the results for that user are <strong>already pre-sorted</strong> as they are read from the index. MongoDB avoids the expensive in-memory sort.</li>
@@ -351,7 +351,7 @@ db.wallet_transactions.find({ clerkUserId: "user_abc_4321" })
 
 <p><strong>The Query:</strong></p>
 <pre><code>
-db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
+db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 </code></pre>
 
 <p><strong>Impact of Indexing:</strong></p>
@@ -363,7 +363,7 @@ db.wallet_transactions.find({ braintreeTransactionId: "mqj10hxj" });
     </ul>
   </li>
   <li><strong>WITH a Unique Index on <code>braintreeTransactionId</code>:</strong>
-    <pre><code>db.wallet_transactions.createIndex({ braintreeTransactionId: 1 }, { unique: true });</code></pre>
+    <pre><code>db.transactions.createIndex({ braintreeTransactionId: 1 }, { unique: true });</code></pre>
     <ul>
       <li>MongoDB uses this unique index (<strong><code>IXSCAN</code></strong>) to <strong>instantly pinpoint</strong> the exact document.</li>
       <li>The <code>unique: true</code> option also <strong>ensures data integrity</strong>, preventing accidental duplicate records for the same Braintree transaction.</li>
@@ -419,9 +419,10 @@ It should not apply to collection names, which should remain consistent across e
 
 <h2>open issues</h2>
 <ul>
-    <li>The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
-    
-   <li>i dont see how the workflow pick the correct environment : dev \ preview : prod</li>
+  <li>should i attached in project the backup db - gemini is against => need to think what to do. maybe the json of</li>
+    <li>who create the timestamp. The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
+    <li>i get warning on npx migrate-mongo status - check demo</li>
+   <li>i dont see how the workflow pick the correct environment : dev\preview\prod</li>
 </ul>
 
 <h2>References</h2>
