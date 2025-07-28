@@ -100,12 +100,12 @@ module.exports = config;
     <li><strong><code>mongodb.databaseName</code></strong>: The specific database within your MongoDB instance that <code>migrate-mongo</code> should manage.</li>
   </ul>
 
-This is the changed part
+This is the file after changes
 
 ```javascript
 
 // Load environment variables from .env file (for local development)
-require('dotenv').config(); 
+require('dotenv').config({ path: '.env.local' });
 
 const config = {
   mongodb: {
@@ -114,8 +114,15 @@ const config = {
     url: process.env.MONGODB_URI , // --- connection string
     databaseName: process.env.MONGODB_DB_NAME ,
 
-...
-}
+options: {
+      //useNewUrlParser: true, // removes a deprecation warning when connecting
+      //useUnifiedTopology: true, // removes a deprecating warning when connecting
+      //   connectTimeoutMS: 3600000, // increase connection timeout to 1 hour
+      //   socketTimeoutMS: 3600000, // increase socket timeout to 1 hour
+    }
+  },
+  ...... 
+
 }
 
 ```
@@ -130,7 +137,7 @@ const config = {
 <p><strong>Example:</strong></p>
 <pre><code>npx migrate-mongo create add_user_wallet_indexes
 </code></pre>
-<p>This command will generate a new JavaScript file in your <code>migrations/</code> directory. The filename will typically include a timestamp followed by your descriptive name (e.g., <code>20250728065805-add_user_wallet_indexes</code>). The timestamp ensures migrations are applied in the correct chronological order.</p>
+<p>This command will generate a new JavaScript file in your <code>migrations/</code> directory. The filename will typically include a timestamp followed by your descriptive name (e.g., <code>20250728065805-add_user_wallet_indexes.js</code>). The timestamp ensures migrations are applied in the correct chronological order.</p>
 
 <h3>2. Write Your Migration Logic (in the created <code>.js</code> file)</h3>
 <p>Open the newly created migration file. It will contain two asynchronous functions: <code>up</code> and <code>down</code>.</p>
@@ -140,7 +147,7 @@ const config = {
 </ul>
 <p>Both functions receive a <code>db</code> object (a native MongoDB driver <code>Db</code> instance) and a <code>client</code> object (a native MongoDB driver <code>MongoClient</code> instance), which you use to interact with your MongoDB database.</p>
 
-<p><strong>Example <code>migrations/20250728065805-add_user_wallet_indexes</code>:</strong></p>
+<p><strong>Example <code>migrations/20250728065805-add_user_wallet_indexes.js</code>:</strong></p>
 
 ```javascript
 const TRANSACTIONS_COLLECTION = "transactions";
@@ -261,6 +268,11 @@ npx migrate-mongo status
 jobs:
 deploy:
   runs-on: ubuntu-latest
+  # IMPORTANT: To target a specific GitHub Environment and its secrets (e.g., 'production'),
+    # you MUST add an 'environment:' key to this job.
+    # For example:
+    # environment: production
+
   steps:
     - uses: actions/checkout@v4
     - name: Setup Node.js
@@ -269,13 +281,13 @@ deploy:
         node-version: "20" # Or your desired Node.js version
 
     - name: Install Project Dependencies
-      run: npm ci # Use 'npm ci' for clean, consistent installs in CI environments
+      run: pnpm ci # Use 'pnpm ci' for clean, consistent installs in CI environments
 
     - name: Run Database Migrations (e.g., for production environment)
       env:
         # These secrets must be configured in your GitHub repository settings
-        MONGODB_URI: ${{ secrets.MONGODB_URI_PROD }}
-        MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME_PROD }}
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
         # Optionally, if your migrate-mongo-config.js is not in the root:
         # MIGRATE_MONGO_CONFIG: './path/to/migrate-mongo-config.js'
       run: npx migrate-mongo up
@@ -467,12 +479,26 @@ You might wonder how migrate-mongo remember not to apply changes if he all ready
 
 <img src='./figs/changlog-collection-in-db.png'/>
 
+<h2>Limitation - Environment Handling in GitHub Actions</h2>
+
+For simplicity in this demonstration, the provided GitHub Actions workflow snippet shows a single job for running migrations. In a full multi-environment setup (development, preview, production), you would typically:
+1.  Have separate jobs (or even separate workflows) for each environment.
+2.  Each job would be explicitly linked to its corresponding GitHub Environment (e.g., `environment: production`) to correctly load environment-specific secrets.
+3.  Conditional logic (e.g., based on branches or manual triggers) would then control which environment's migration job gets executed.
+
+While this guide focuses on the core integration of `migrate-mongo` and GitHub Actions, implementing the full branching and environment-specific deployment logic for all three environments is a more advanced topic and is outside the direct scope of this simplified example.
+
 <h2>Points of Interest</h2>
 <ul>
-    <li>You  can use typescript files for the migration files but not used here for simplicity</li>
-   <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host). It should not apply to collection names, which should remain consistent across environments</li>
-  <li>db is not attached for few reasons including security. you can do it your self given the attached transaction json</li>
-   <li>the github action workflow here does not choose the dev\preview\prod environemt - its outside the scope of this repo. However, using github action environment is the solution that should be used</li>
+    <li><strong>Environment-Specific Configuration:</strong> The connection string (including database name, username, and password) must be handled via **environment variables**. For local development, use a <code>.env.local</code> file with the <code>dotenv</code> package. For CI/CD, leverage **GitHub Actions Environments** and their dedicated secrets to securely manage credentials for development, preview, and production.
+        <ul>
+            <li><strong>Important:</strong> Collection names (e.g., "transactions", "changelog") should remain consistent across all environments to ensure migrations apply correctly.</li>
+        </ul>
+    </li>
+    <li><strong>Database Backup Strategy:</strong> Avoid committing database backups (even JSON exports) directly into your Git repository for security and repository size reasons. Use dedicated database backup services (like MongoDB Atlas automated backups) or secure cloud storage solutions. The provided transaction JSON is illustrative for the document, not a backup to be versioned.</li>
+    <li><strong>Migration Timestamps:</strong> <code>migrate-mongo</code> automatically prefixes migration filenames with a timestamp (e.g., <code>20250728065805-add_user_wallet_indexes.js</code>). This timestamp is crucial for ensuring migrations are applied in the **correct chronological order** across all environments, regardless of Git commit order or concurrent development. Workflow files do not require timestamps as their execution order is determined by GitHub Actions' internal logic and defined workflow steps.</li>
+    <li><strong>MongoDB Driver Deprecations:</strong> If you encounter warnings like `useNewUrlParser` or `useUnifiedTopology` being deprecated, you can safely remove these options from your `migrate-mongo-config.js` file as they have no effect in modern MongoDB Node.js driver versions (4.0.0+).</li>
+    <li><strong>TypeScript Support:</strong> While this guide uses JavaScript for simplicity, <code>migrate-mongo</code> supports TypeScript for migration files. You can configure your project to use <code>.ts</code> migration files if preferred.</li>
 </ul>
 
 
