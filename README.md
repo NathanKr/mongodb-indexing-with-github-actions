@@ -408,6 +408,8 @@ db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
 <h2>Design</h2>
 
+<p>This section explores the design decisions and reasoning behind the tools and methodologies chosen for this project's database management.</p>
+
 <h3> why migrate-mongo and not mongodb driver </h3>
   <p>You're right to ask this question, especially since you're already leveraging the power of GitHub Actions for automation. While the MongoDB driver is the fundamental tool for interacting with your database, <code>migrate-mongo</code> provides a crucial layer of management and organization that the raw driver doesn't.</p>
 
