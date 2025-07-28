@@ -99,6 +99,26 @@ module.exports = config;
     <li><strong><code>mongodb.databaseName</code></strong>: The specific database within your MongoDB instance that <code>migrate-mongo</code> should manage.</li>
   </ul>
 
+This is the changed part
+
+```javascript
+
+// Load environment variables from .env file (for local development)
+require('dotenv').config(); 
+
+const config = {
+  mongodb: {
+    // These will now be populated from your .env file locally,
+    // or from GitHub Actions secrets when deployed.
+    url: process.env.MONGODB_URI , 
+    databaseName: process.env.MONGODB_DB_NAME ,
+
+...
+}
+}
+
+```
+
 <h2>Usage</h2>
 <p>Once <code>migrate-mongo</code> is installed and configured, you can start creating and applying your database migrations using its command-line interface (CLI).</p>
 
@@ -415,14 +435,15 @@ first ever migrate-mongo status
     <li>You  can use typescript files for the migration files but not used here for simplicity</li>
    <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host).
 It should not apply to collection names, which should remain consistent across environments</li>
+  <li>db is not attached for few reasons including security. you can do it your self given the attached transaction json</li>
+   <li>the github action workflow does not choose the dev\preview\prod environemt - its outside the scope of this repo. However, using github action environment is the solution that should be used</li>
 </ul>
 
 <h2>open issues</h2>
 <ul>
-  <li>should i attached in project the backup db - gemini is against => need to think what to do. maybe the json of</li>
+  <li>how to load the env variables in this repo</li>
     <li>who create the timestamp. The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
     <li>i get warning on npx migrate-mongo status - check demo</li>
-   <li>i dont see how the workflow pick the correct environment : dev\preview\prod</li>
 </ul>
 
 <h2>References</h2>

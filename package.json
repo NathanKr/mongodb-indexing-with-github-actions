@@ -1,5 +1,6 @@
 {
 	"devDependencies": {
+		"dotenv": "^17.2.1",
 		"migrate-mongo": "^12.1.3"
 	}
 }

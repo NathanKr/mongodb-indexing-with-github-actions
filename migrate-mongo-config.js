@@ -1,12 +1,14 @@
 // In this file you can configure migrate-mongo
 
+// Load environment variables from .env file (for local development)
+require('dotenv').config(); 
+
 const config = {
   mongodb: {
-    // TODO Change (or review) the url to your MongoDB:
-    url: "mongodb://localhost:27017",
-
-    // TODO Change this to your database name:
-    databaseName: "YOURDATABASENAME",
+    // These will now be populated from your .env file locally,
+    // or from GitHub Actions secrets when deployed.
+    url: process.env.MONGODB_URI , 
+    databaseName: process.env.MONGODB_DB_NAME ,
 
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
