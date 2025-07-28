@@ -1,8 +1,9 @@
 <h1>Project Name</h1>
-....
+Create mongodb indexing with migrate-mongo and github actions
 
 <h2>Project Description</h2>
-....
+This project demonstrates a robust and automated solution for managing MongoDB database schema changes, with a specific focus on creating and applying performance-critical indexes, across multiple environments (development, preview, and production). Leveraging `migrate-mongo` for version-controlled database migrations and integrating seamlessly with GitHub Actions for CI/CD, this setup ensures consistent, repeatable, and secure database updates, making it ideal for small teams with simple yet critical database management needs.
+
 
 <h2>Motivation</h2>
 You have three environemnt : dev \ preview \ production and you have mongodb database .
@@ -453,20 +454,27 @@ now lets check status
 
 <img src='./figs/status-after-index-create.png'/>
 
+if you try another npx migrate-mongo up with no changes you will get
+
+<img src='./figs/migrate-mongo-up-with-no-changes.png'/>
+
+and status
+
+<img src='./figs/status-following-no-change.png'/>
+
+
+You might wonder how migrate-mongo remember not to apply changes if he all ready did it. this is done by adding a collection name changelog to your db as follows
+
+<img src='./figs/changlog-collection-in-db.png'/>
+
 <h2>Points of Interest</h2>
 <ul>
     <li>You  can use typescript files for the migration files but not used here for simplicity</li>
-   <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host).
-It should not apply to collection names, which should remain consistent across environments</li>
+   <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host). It should not apply to collection names, which should remain consistent across environments</li>
   <li>db is not attached for few reasons including security. you can do it your self given the attached transaction json</li>
    <li>the github action workflow here does not choose the dev\preview\prod environemt - its outside the scope of this repo. However, using github action environment is the solution that should be used</li>
 </ul>
 
-<h2>open issues</h2>
-<ul>
-    <li>who create the timestamp. The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
-    <li>i get warning on npx migrate-mongo status - check demo</li>
-</ul>
 
 <h2>References</h2>
 <ul>
