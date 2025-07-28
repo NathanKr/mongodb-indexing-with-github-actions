@@ -110,7 +110,7 @@ const config = {
   mongodb: {
     // These will now be populated from your .env file locally,
     // or from GitHub Actions secrets when deployed.
-    url: process.env.MONGODB_URI , 
+    url: process.env.MONGODB_URI , // --- connection string
     databaseName: process.env.MONGODB_DB_NAME ,
 
 ...
@@ -426,6 +426,11 @@ db.transactions.find({ braintreeTransactionId: "mqj10hxj" });
 
 <h2>Demo</h2>
 
+.env.local (development)
+
+<img src='./figs/env-local.png'/>
+
+
 first ever migrate-mongo status
 
 <img src='./figs/first-ever-migrate-mongo-status.png'/>
@@ -436,12 +441,11 @@ first ever migrate-mongo status
    <li>Handling development / preview / production via environment variables should apply to the connection string — including the database name, database username, and password (and optionally the host).
 It should not apply to collection names, which should remain consistent across environments</li>
   <li>db is not attached for few reasons including security. you can do it your self given the attached transaction json</li>
-   <li>the github action workflow does not choose the dev\preview\prod environemt - its outside the scope of this repo. However, using github action environment is the solution that should be used</li>
+   <li>the github action workflow here does not choose the dev\preview\prod environemt - its outside the scope of this repo. However, using github action environment is the solution that should be used</li>
 </ul>
 
 <h2>open issues</h2>
 <ul>
-  <li>how to load the env variables in this repo</li>
     <li>who create the timestamp. The filename will typically include a timestamp followed by your descriptive name - why timestamp is need it is in git. why workflow file dont need timestamp and this needs</li>
     <li>i get warning on npx migrate-mongo status - check demo</li>
 </ul>
